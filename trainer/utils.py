@@ -29,7 +29,8 @@ class DataGenerator(object):
     def __init__(self, params, data_path, train_csv, val_csv, target_size=(224, 224)):
         self.params = params
         self.target_size = target_size
-        self.train_idg = MildImageDataGenerator('dataset/' + train_csv, **params)
+        self.train_idg = MildImageDataGenerator(
+            'dataset/' + train_csv, **params)
         self.test_idg = MildImageDataGenerator('dataset/' + val_csv)
         self.data_path = data_path
         if not self.data_path.endswith('/'):
@@ -46,7 +47,7 @@ class DataGenerator(object):
             else:
                 with file_io.FileIO("dataset/" + self.train_csv, mode='w+') as output_f:
                     output_f.write(train_f.read())
-        return self.train_idg.flow_from_directory("dataset/tops/",
+        return self.train_idg.flow_from_directory("dataset/",
                                                   batch_size=batch_size,
                                                   target_size=self.target_size, shuffle=False)
 
@@ -54,7 +55,7 @@ class DataGenerator(object):
         with file_io.FileIO(self.data_path + self.val_csv, mode='r') as val_f:
             with file_io.FileIO("dataset/" + self.val_csv, mode='w+') as output_f:
                 output_f.write(val_f.read())
-        return self.test_idg.flow_from_directory("dataset/tops/",
+        return self.test_idg.flow_from_directory("dataset/",
                                                  batch_size=batch_size,
                                                  target_size=self.target_size,
                                                  shuffle=False)
@@ -84,7 +85,8 @@ def print_trainable_counts(model):
     non_trainable_count = int(
         np.sum([K.count_params(p) for p in set(model.non_trainable_weights)]))
 
-    logging.info('Total params: {:,}'.format(trainable_count + non_trainable_count))
+    logging.info('Total params: {:,}'.format(
+        trainable_count + non_trainable_count))
     logging.info('Trainable params: {:,}'.format(trainable_count))
     logging.info('Non-trainable params: {:,}'.format(non_trainable_count))
 
