@@ -20,8 +20,8 @@ set_random_seed(12)
 
 job_dir = 'output'
 data_path = '../dataset'
-train_csv = "../train_triplet_pair.csv"
-val_csv = "../test_triplet_pair.csv"
+train_csv = "train_triplet_pair.csv"
+val_csv = "test_triplet_pair.csv"
 train_epoch = 25
 batch_size = 16
 lr = 0.001
