@@ -1,7 +1,7 @@
 import random
 
 from tensorflow.python.keras import backend as K
-# from tensorflow.python.keras.applications.resnet50 import ResNet50
+from tensorflow.python.keras.applications.resnet50 import ResNet50
 from tensorflow.python.keras.applications.mobilenet import MobileNet
 from tensorflow.python.keras.applications.vgg16 import VGG16
 from tensorflow.python.keras.applications.vgg19 import VGG19
