@@ -1,4 +1,5 @@
 import tensorflow
+from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg19 import VGG19
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model, load_model
@@ -19,9 +20,9 @@ seed(11)
 set_random_seed(12)
 
 job_dir = 'output'
-data_path = '../dataset'
-train_csv = "train_triplet_pair.csv"
-val_csv = "test_triplet_pair.csv"
+data_path = 'dataset'
+train_csv = "train_triplet_pairs_reduced.csv"
+val_csv = "val_triplet_pairs_reduced.csv"
 train_epoch = 25
 batch_size = 16
 lr = 0.001
@@ -121,6 +122,48 @@ def ranknet():
     final_model = Model(inputs=vgg_model.input, outputs=l2_norm_final)
 
     return final_model
+
+def Mildnet_vgg19():
+    vgg_model = VGG19(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+
+    for layer in vgg_model.layers[:10]:
+        layer.trainable = False
+
+    intermediate_layer_outputs = get_layers_output_by_name(vgg_model,
+                                                           ["block1_pool", "block2_pool", "block3_pool", "block4_pool"])
+    convnet_output = GlobalAveragePooling2D()(vgg_model.output)
+    for layer_name, output in intermediate_layer_outputs.items():
+        output = GlobalAveragePooling2D()(output)
+        convnet_output = concatenate([convnet_output, output])
+
+    convnet_output = Dense(2048, activation='relu')(convnet_output)
+    convnet_output = Dropout(0.6)(convnet_output)
+    convnet_output = Dense(2048, activation='relu')(convnet_output)
+    convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
+
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
+
+    return final_model
+
+def Mildnet_all_trainable():
+    vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+
+    intermediate_layer_outputs = get_layers_output_by_name(vgg_model,
+                                                           ["block1_pool", "block2_pool", "block3_pool", "block4_pool"])
+    convnet_output = GlobalAveragePooling2D()(vgg_model.output)
+    for layer_name, output in intermediate_layer_outputs.items():
+        output = GlobalAveragePooling2D()(output)
+        convnet_output = concatenate([convnet_output, output])
+
+    convnet_output = Dense(2048, activation='relu')(convnet_output)
+    convnet_output = Dropout(0.6)(convnet_output)
+    convnet_output = Dense(2048, activation='relu')(convnet_output)
+    convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
+
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
+
+    return final_model
+
 
 
 model = ranknet()
