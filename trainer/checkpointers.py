@@ -12,7 +12,7 @@ from .utils import *
 from .accuracy import *
 from time import time
 from tensorflow.python.lib.io import file_io
-from .datagen import ImageDataGeneratorCustom
+from trainer.image.datagen import MildImageDataGenerator
 import logging
 
 
@@ -248,7 +248,7 @@ class TestAccuracy(tf.keras.callbacks.Callback):
         def __init__(self, params, data_path, target_size=(224, 224)):
             self.params = params
             self.target_size = target_size
-            self.idg = ImageDataGeneratorCustom(**params)
+            self.idg = MildImageDataGenerator('tops_test.csv', **params)
             self.data_path = data_path
 
         def get_test_generator(self, batch_size):
@@ -258,8 +258,7 @@ class TestAccuracy(tf.keras.callbacks.Callback):
                         output_f.write(input_f.read())
             return self.idg.flow_from_directory("tops/",
                                                 batch_size=batch_size,
-                                                target_size=self.target_size, shuffle=False,
-                                                triplet_path='tops_test.csv')
+                                                target_size=self.target_size, shuffle=False)
 
     def __init__(self, data_path):
         self.data_path = data_path
